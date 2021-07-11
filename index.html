@@ -12,17 +12,28 @@
     <script src="./lib/webgl-debug.js"></script>
     <script src="./lib/cuon-utils.js"></script>
     <script>
-      var VSHADER_SOURCE = `attribute vec4 a_Position;
-        attribute float a_PointSize;
+      var VSHADER_SOURCE =
+       `attribute vec4 a_Position;
+        uniform vec4 u_Translation;
         void main() {
-        gl_Position = a_Position;
-        gl_PointSize = a_PointSize;
+        gl_Position = a_Position + u_Translation;        
         }`
+      // attribute float a_PointSize;
+      // gl_PointSize = a_PointSize;
       var FSHADER_SOURCE = ` precision mediump float;
         uniform vec4 u_FragColor;
         void main(){
         gl_FragColor = u_FragColor;
         }`
+
+      // var FSHADER_SOURCE = `
+      // void main(){
+      // gl_FragColor = vec4(1.0,0.0,0.0,1.0);
+      // }`
+
+      var Tx = 0.5,
+        Ty = 0.5,
+        Tz = 0.0
 
       function main() {
         var canvas = document.getElementById('example')
@@ -42,21 +53,27 @@
         var n = initVertexBuffers(gl)
         console.log('n', n)
 
-        var a_PointSize = gl.getAttribLocation(gl.program, 'a_PointSize')
+        var u_Translation = gl.getUniformLocation(gl.program, 'u_Translation')
+        gl.uniform4f(u_Translation, Tx, Ty, Tz, 0.0)
+
+        // var a_PointSize = gl.getAttribLocation(gl.program, 'a_PointSize')
 
         var u_FragColor = gl.getUniformLocation(gl.program, 'u_FragColor')
 
-        gl.vertexAttrib1f(a_PointSize, 10.0)
+        // gl.vertexAttrib1f(a_PointSize, 10.0)
 
         gl.clearColor(0.0, 0.0, 0.0, 1.0)
         gl.clear(gl.COLOR_BUFFER_BIT)
 
-        gl.drawArrays(gl.POINTS, 0, n)
+        gl.drawArrays(gl.TRIANGLES, 0, n)
       }
 
       function initVertexBuffers(gl) {
-        var vertices = new Float32Array([0.0, 0.5, -0.5, -0.5, 0.5, -0.5])
+        var vertices = new Float32Array([
+           -0.5, -0.5, 0.1, 0.5, 0.5, -0.5,
+        ])
         var n = 3
+
         var vertexBuffer = gl.createBuffer()
         console.log(vertexBuffer)
         if (!vertexBuffer) {

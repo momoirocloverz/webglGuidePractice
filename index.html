@@ -16,25 +16,19 @@
       `attribute vec4 a_Position;
         uniform float u_CosB,u_SinB;
         void main() {
-        gl_Position.x = a_Position.x*u_CosB - a_Position.y * u_SinB;        
-        gl_Position.y = a.Position.y*u_SinB + a_Position.y*u_CosB;
-        gl_Position.z = a_Position.z;
-        gl_Position.w = 1.0;
-        }`
-      // attribute float a_PointSize;
-      // gl_PointSize = a_PointSize;
-      var FSHADER_SOURCE = ` precision mediump float;
-        uniform vec4 u_FragColor;
-        void main(){
-        gl_FragColor = u_FragColor;
+            gl_Position.x = a_Position.x*u_CosB - a_Position.y * u_SinB;        
+            gl_Position.y = a_Position.x*u_SinB + a_Position.y*u_CosB;
+            gl_Position.z = a_Position.z;
+            gl_Position.w = 1.0;
         }`
 
-      // var FSHADER_SOURCE = `
-      // void main(){
-      // gl_FragColor = vec4(1.0,0.0,0.0,1.0);
-      // }`
 
-      var angle = 90.0
+      var FSHADER_SOURCE = `
+      void main(){
+      gl_FragColor = vec4(1.0,0.0,0.0,1.0);
+      }`
+
+      var ANGLE = 90.0
 
       function main() {
         var canvas = document.getElementById('example')

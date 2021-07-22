@@ -11,24 +11,20 @@
     <script src="./lib/webgl-utils.js"></script>
     <script src="./lib/webgl-debug.js"></script>
     <script src="./lib/cuon-utils.js"></script>
+    <script src="./lib/cuon-matrix.js"></script>
     <script>
-      var VSHADER_SOURCE = 
-      `attribute vec4 a_Position;
-        uniform float u_CosB,u_SinB;
+      var VSHADER_SOURCE = `attribute vec4 a_Position;
+        uniform mat4 u_ModelMatrix;
         void main() {
-            gl_Position.x = a_Position.x*u_CosB - a_Position.y * u_SinB;        
-            gl_Position.y = a_Position.x*u_SinB + a_Position.y*u_CosB;
-            gl_Position.z = a_Position.z;
-            gl_Position.w = 1.0;
+            gl_Position = u_ModelMatrix * a_Position;
         }`
-
 
       var FSHADER_SOURCE = `
       void main(){
       gl_FragColor = vec4(1.0,0.0,0.0,1.0);
       }`
 
-      var ANGLE = 90.0
+      var ANGLE = 45.0
 
       function main() {
         var canvas = document.getElementById('example')
@@ -48,23 +44,21 @@
         var n = initVertexBuffers(gl)
         console.log('n', n)
 
-        var radian = Math.PI*ANGLE/180.0;
-        console.log( radian )
-        var cosB = Math.cos(radian)
-        var sinB = Math.sin(radian)
-
-        var u_CosB = gl.getUniformLocation(gl.program,'u_CosB')
-        var u_SinB = gl.getUniformLocation(gl.program,'u_SinB')
-
-        gl.uniform1f( u_CosB,cosB )
-        gl.uniform1f(u_SinB,sinB)
-
-
-
         gl.clearColor(0.0, 0.0, 0.0, 1.0)
-        gl.clear(gl.COLOR_BUFFER_BIT)
 
-        gl.drawArrays(gl.TRIANGLES, 0, n)
+        var radian = (Math.PI * ANGLE) / 180.0
+        console.log(radian)
+        var u_ModelMatrix = gl.getUniformLocation(gl.program, 'u_ModelMatrix')
+
+        var currentAngle = 0.0
+        var modelMatrix = new Matrix4()
+
+        var tick = function () {
+          currentAngle = animate(currentAngle)
+          draw(gl, n, modelMatrix, u_ModelMatrix)
+          requestAnimationFrame(tick)
+          tick()
+        }
       }
 
       function initVertexBuffers(gl) {
@@ -86,6 +80,23 @@
 
         gl.enableVertexAttribArray(a_Position)
         return n
+      }
+
+      function draw(gl, n, currentAngle, modelMatrix, u_ModelMatrix) {
+        modelMatrix.setRotate(currentAngle, 0, 0, 1)
+        gl.unifromMatrixf4v(u_ModelMatrix, false, modelMatrix.elements)
+        gl.clear(gl.COLOR_BUFFER_BIT)
+        gl.drawArrays(gl.TRIANGLES, 0, n)
+      }
+
+      var g_last = Date.now()
+      function animate(angle) {
+        var now = Date.now()
+        var elapsed = now - g_last
+        g_last = now
+        var newAngle = angle + (ANGLE_STEP * elapsed) / 1000.0
+
+        return (newAngle %= 360)
       }
     </script>
   </body>

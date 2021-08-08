@@ -7,41 +7,27 @@
     <title>Document</title>
   </head>
   <body onLoad="main()">
-
-    <img src="./resources/7herbs.JPG">
     <canvas id="example" width="700" height="700"></canvas>
     <script src="./lib/webgl-utils.js"></script>
     <script src="./lib/webgl-debug.js"></script>
     <script src="./lib/cuon-utils.js"></script>
     <script src="./lib/cuon-matrix.js"></script>
     <script>
-      //   var VSHADER_SOURCE = `attribute vec4 a_Position;
-      //       attribute vec4 a_Color;
-      //       varying vec4 v_Color;
-      //       void main() {
-      //           gl_Position = a_Position;
-      //           gl_PointSize = 10.0;
-      //           v_Color = a_Color;
-      //       }`
-      //   var FSHADER_SOURCE = `
-      //   precision mediump float;
-      //   varying vec4 v_Color;
-      //     void main(){
-      //     gl_FragColor = v_Color;
-      //     }`
-
       var VSHADER_SOURCE = `
         attribute vec4 a_Position;
+        attribute vec2 a_TexCoord;
+        varying vec2 v_TexCoord;
         void main(){
             gl_Position = a_Position;
+            v_TexCoord = a_TexCoord;
         }
         `
       var FSHADER_SOURCE = `
         precision mediump float;
-        uniform float u_Width;
-        uniform float u_Height;
+        uniform sampler2D u_Sampler;
+        varying vec2 v_TexCoord;
         void main(){
-            gl_FragColor = vec4( gl_FragCoord.x/u_Width,0.0,gl_FragCoord.y/u_Height,1.0 );
+            gl_FragColor = texture2D( u_Sampler,v_TexCoord );
         }
         `
 
@@ -63,59 +49,96 @@
         console.log('n', n)
 
         gl.clearColor(0.0, 0.0, 0.0, 1.0)
-        gl.clear(gl.COLOR_BUFFER_BIT)
-        gl.drawArrays(gl.TRIANGLES, 0, n)
+        // gl.clear(gl.COLOR_BUFFER_BIT)
+        // gl.drawArrays(gl.TRIANGLES, 0, n)
+
+        if (!initTextures(gl, n)) {
+          console.log('失败e')
+          return false
+        }
       }
 
       function initVertexBuffers(gl) {
-        // var verticesColors = new Float32Array([
-        //   0, 0.5, 1.0, 0.0, 0.0, -0.5, -0.5, 0.0, 1.0, 0.0, 0.5, -0.5, 0.0, 0.0,
-        //   1.0,
-        // ])
-        var vertices = new Float32Array([0, 0.5, -0.5, -0.5, 0.5, -0.5])
+        var verticesTexCoords = new Float32Array([
+          -0.5, 0.5, -0.3, 1.7,
+           -0.5, -0.5, -0.3, -0.2,
+            0.5, 0.5, 1.7, 1.7,
+             0.5, -0.5, 1.7, -0.2,
+        ])
 
-        var n = 3
+        var n = 4
 
-        var vertexColorBuffer = gl.createBuffer()
-        console.log(vertexColorBuffer)
-        if (!vertexColorBuffer) {
+        var vertexTexCoordBuffer = gl.createBuffer()
+        console.log(vertexTexCoordBuffer)
+        if (!vertexTexCoordBuffer) {
           console.log('Failed to create the buffer object')
           return -1
         }
-        gl.bindBuffer(gl.ARRAY_BUFFER, vertexColorBuffer)
-        gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW)
+        gl.bindBuffer(gl.ARRAY_BUFFER, vertexTexCoordBuffer)
+        gl.bufferData(gl.ARRAY_BUFFER, verticesTexCoords, gl.STATIC_DRAW)
 
-        var FSIZE = vertices.BYTES_PER_ELEMENT
+        var FSIZE = verticesTexCoords.BYTES_PER_ELEMENT
 
         var a_Position = gl.getAttribLocation(gl.program, 'a_Position')
 
         console.log(a_Position)
-        gl.vertexAttribPointer(a_Position, 2, gl.FLOAT, false, 0, 0)
+        gl.vertexAttribPointer(a_Position, 2, gl.FLOAT, false, FSIZE * 4, 0)
 
         gl.enableVertexAttribArray(a_Position)
 
-        var u_Width = gl.getUniformLocation(gl.program, 'u_Width')
+        var a_TexCoord = gl.getAttribLocation(gl.program, 'a_TexCoord')
 
-        var u_Height = gl.getUniformLocation(gl.program, 'u_Height')
+        console.log('a_TexCoord', a_TexCoord)
 
-        console.log('u_Width', u_Width)
-        console.log('u_Height', u_Height)
+        gl.vertexAttribPointer(
+          a_TexCoord,
+          2,
+          gl.FLOAT,
+          false,
+          FSIZE * 4,
+          FSIZE * 2
+        )
 
-        gl.uniform1f(u_Width, gl.drawingBufferWidth)
-        gl.uniform1f(u_Height, gl.drawingBufferHeight)
-
-        // gl.vertexAttribPointer(
-        //   a_Color,
-        //   3,
-        //   gl.FLOAT,
-        //   false,
-        //   FSIZE * 5,
-        //   FSIZE * 2
-        // )
-
-        // gl.enableVertexAttribArray(a_Color)
+        gl.enableVertexAttribArray(a_TexCoord)
 
         return n
+      }
+      function initTextures(gl, n) {
+        var texture = gl.createTexture()
+        if (!texture) {
+          console.log('texture 失败')
+          return false
+        }
+        var u_Sampler = gl.getUniformLocation(gl.program, 'u_Sampler')
+        if (!u_Sampler) {
+          console.log('u_Sampler失败')
+          return false
+        }
+        var image = new Image()
+        if (!image) {
+          console.log('image 失败')
+          return false
+        }
+        image.onload = function () {
+          loadTexture(gl, n, texture, u_Sampler, image)
+        }
+        image.src = './resources/sky.jpg'
+        return true
+      }
+      function loadTexture(gl, n, texture, u_Sampler, image) {
+        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1)
+        gl.activeTexture(gl.TEXTURE0)
+        gl.bindTexture(gl.TEXTURE_2D, texture)
+
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.MIRRORED_REPEAT)
+
+
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image)
+        gl.uniform1i(u_Sampler, 0)
+        gl.clear(gl.COLOR_BUFFER_BIT)
+        gl.drawArrays(gl.TRIANGLE_STRIP, 0, n)
       }
     </script>
   </body>

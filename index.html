@@ -28,8 +28,8 @@
         uniform sampler2D u_Sampler1;
         varying vec2 v_TexCoord;
         void main(){
-            vec4 color0 = texture2D(u_Sample0,v_TexCoord);
-            vec4 color1 = texture2D(u_Sampler1,v_Texcoord);
+            vec4 color0 = texture2D(u_Sampler0,v_TexCoord);
+            vec4 color1 = texture2D(u_Sampler1,v_TexCoord);
             gl_FragColor = color0 * color1;
         }
         `
@@ -61,8 +61,10 @@
 
       function initVertexBuffers(gl) {
         var verticesTexCoords = new Float32Array([
-          -0.5, 0.5, 0.0, 1.0, -0.5, -0.5, 0.0, 0.0, 0.5, 0.5, 1.0, 1.0, 0.5,
-          -0.5, 1.0, 0.0,
+          -0.5, 0.5, 0.0, 1.0,
+           -0.5, -0.5, 0.0, 0.0,
+            0.5, 0.5, 1.0, 1.0, 
+            0.5, -0.5, 1.0, 0.0,
         ])
 
         var n = 4
@@ -119,13 +121,13 @@
         image1.onload = function () {
           loadTexture(gl, n, texture1, u_Sampler1, image1, 1)
         }
-        image1.src = './resources/circle.jpg'
+        image1.src = './resources/circle.gif'
         return true
       }
       var g_texUnit0 = false
       var g_texUnit1 = false
 
-      function loadTexture(gl, n, texture, u_Sampler, image) {
+      function loadTexture(gl, n, texture, u_Sampler, image,texUnit) {
         gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1)
         if (texUnit == 0) {
           gl.activeTexture(gl.TEXTURE0)
@@ -142,9 +144,11 @@
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.MIRRORED_REPEAT)
 
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image)
-        gl.uniform1i(u_Sampler, 0)
+        gl.uniform1i(u_Sampler, texUnit)
         gl.clear(gl.COLOR_BUFFER_BIT)
-        gl.drawArrays(gl.TRIANGLE_STRIP, 0, n)
+        if (g_texUnit0 && g_texUnit1) {
+          gl.drawArrays(gl.TRIANGLE_STRIP, 0, n)
+        }
       }
     </script>
   </body>

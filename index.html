@@ -8,6 +8,8 @@
   </head>
   <body onLoad="main()">
     <canvas id="example" width="700" height="700"></canvas>
+    <div id="nearFar">于此</div>
+
     <script src="./lib/webgl-utils.js"></script>
     <script src="./lib/webgl-debug.js"></script>
     <script src="./lib/cuon-utils.js"></script>
@@ -16,11 +18,10 @@
       var VSHADER_SOURCE = `
         attribute vec4 a_Position;
         attribute vec4 a_Color;
-        uniform mat4 u_ViewMatrix;
         uniform mat4 u_ProjMatrix;
         varying vec4 v_Color;
         void main(){
-            gl_Position = u_ProjMatrix* u_ViewMatrix  * a_Position;
+            gl_Position = u_ProjMatrix  * a_Position;
             v_Color = a_Color;
         }
         `
@@ -37,6 +38,9 @@
           console.log('failed to retrieve the canvas element')
           return false
         }
+        var nf = document.getElementById('nearFar')
+        console.log('nf', nf)
+
         var gl = getWebGLContext(canvas)
         if (!gl) {
           console.log('Failed to get rending contextfor webgl')
@@ -48,8 +52,6 @@
         var n = initVertexBuffers(gl)
         console.log('n', n)
         gl.clearColor(0.0, 0.0, 0.0, 1.0)
-        var u_ViewMatrix = gl.getUniformLocation(gl.program, 'u_ViewMatrix')
-        console.log('u_ViewMatrix', u_ViewMatrix)
 
         var u_ProjMatrix = gl.getUniformLocation(gl.program, 'u_ProjMatrix')
 
@@ -57,14 +59,14 @@
 
         var viewMatrix = new Matrix4()
         document.onkeydown = function (ev) {
-          keydown(ev, gl, n, u_ViewMatrix, viewMatrix)
+          keydown(ev, gl, n, u_ProjMatrix, viewMatrix, nf)
         }
 
-        var projMatrix = new Matrix4()
-        projMatrix.setOrtho(-1.0, 1.0, -1.0, 1.0, 0.0, 2.0)
-        gl.uniformMatrix4fv(u_ProjMatrix, false, projMatrix.elements)
+        // var projMatrix = new Matrix4()
+        // projMatrix.setOrtho(-1.0, 1.0, -1.0, 1.0, 0.0, 2.0)
+        // gl.uniformMatrix4fv(u_ProjMatrix, false, projMatrix.elements)
 
-        draw(gl, n, u_ViewMatrix, viewMatrix)
+        draw(gl, n, u_ProjMatrix, viewMatrix, nf)
       }
 
       function initVertexBuffers(gl) {
@@ -115,27 +117,43 @@
 
         return n
       }
-      var g_eyeX = 0.2,
-        g_eyeY = 0.25,
-        g_eyeZ = 0.25
+  
+      var g_near = 0.0,
+        g_far = 0.5
 
-      function keydown(ev, gl, n, u_ViewMatrix, viewMatrix) {
-        if (ev.keyCode == 39) {
-          g_eyeX += 0.03
-        } else if (ev.keyCode == 37) {
-          g_eyeX -= 0.03
-        } else {
-          return
+      function keydown(ev, gl, n, u_ProjMatrix, viewMatrix,nf) {
+        switch (ev.keyCode) {
+          case 39:
+            g_near += 1.0
+            break
+          case 37:
+            g_near -= 1.0
+            break
+          case 38:
+            g_far += 1.0
+            break
+          case 40:
+            g_far -= 1.0
+            break
+          default:
+            return
         }
-        draw(gl, n, u_ViewMatrix, viewMatrix)
+        draw(gl, n, u_ProjMatrix, viewMatrix,nf)
       }
 
-      function draw(gl, n, u_ViewMatrix, viewMatrix) {
-        viewMatrix.setLookAt(g_eyeX, g_eyeY, g_eyeZ, 0, 0, 0, 0, 1, 0)
+      function draw(gl, n, u_ProjMatrix, viewMatrix,nf) {
+        viewMatrix.setOrtho(-1.0, 1.0, -1.0, 1.0, g_near, g_far)
 
-        gl.uniformMatrix4fv(u_ViewMatrix, false, viewMatrix.elements)
+        gl.uniformMatrix4fv(u_ProjMatrix, false, viewMatrix.elements)
 
         gl.clear(gl.COLOR_BUFFER_BIT)
+
+        nf.innerHTML =
+          'near: ' +
+          Math.round(g_near * 100) / 100 +
+          ', far: ' +
+          Math.round(g_far * 100) / 100
+
         gl.drawArrays(gl.TRIANGLES, 0, n)
       }
     </script>

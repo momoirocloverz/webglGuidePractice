@@ -8,8 +8,6 @@
   </head>
   <body onLoad="main()">
     <canvas id="example" width="700" height="700"></canvas>
-    <div id="nearFar">于此</div>
-
     <script src="./lib/webgl-utils.js"></script>
     <script src="./lib/webgl-debug.js"></script>
     <script src="./lib/cuon-utils.js"></script>
@@ -48,24 +46,16 @@
         }
         var n = initVertexBuffers(gl)
         gl.clearColor(0.0, 0.0, 0.0, 1.0)
-
-
         var u_MvpMatrix = gl.getUniformLocation(gl.program, 'u_MvpMatrix')
-
         var modelMatrix = new Matrix4()
-
         var viewMatrix = new Matrix4()
         var projMatrix = new Matrix4()
         var mvpMatrix = new Matrix4()
-
         modelMatrix.setTranslate(0.75, 0, 0)
         viewMatrix.setLookAt(0, 0, 5, 0, 0, -100, 0, 1, 0)
         projMatrix.setPerspective(30, canvas.width / canvas.height, 1, 100)
         mvpMatrix.set(projMatrix).multiply(viewMatrix).multiply(modelMatrix)
-
         gl.uniformMatrix4fv(u_MvpMatrix, false, mvpMatrix.elements)
-
-        
         gl.clear(gl.COLOR_BUFFER_BIT)
         gl.drawArrays(gl.TRIANGLES, 0, n)
         modelMatrix.setTranslate(-0.75, 0, 0)
@@ -73,147 +63,84 @@
         gl.uniformMatrix4fv(u_MvpMatrix, false, mvpMatrix.elements)
         gl.drawArrays(gl.TRIANGLES, 0, n)
       }
-
       function initVertexBuffers(gl) {
         var verticesColors = new Float32Array([
-          0.75,
+          0.0,
           1.0,
           -4.0,
           0.4,
           1.0,
-          0.4, // The back green one
-          0.25,
+          0.4, 
+
+          -0.5,
           -1.0,
           -4.0,
           0.4,
           1.0,
           0.4,
-          1.25,
+
+          0.5,
           -1.0,
           -4.0,
           1.0,
           0.4,
           0.4,
 
-          0.75,
+          0.0,
           1.0,
           -2.0,
           1.0,
           1.0,
-          0.4, // The middle yellow one
-          0.25,
+          0.4, 
+
+          -0.5,
           -1.0,
           -2.0,
           1.0,
           1.0,
           0.4,
-          1.25,
+
+          0.5,
           -1.0,
           -2.0,
           1.0,
           0.4,
           0.4,
 
-          0.75,
+          0.0,
           1.0,
           0.0,
           0.4,
           0.4,
-          1.0, // The front blue one
-          0.25,
-          -1.0,
-          0.0,
-          0.4,
-          0.4,
-          1.0,
-          1.25,
-          -1.0,
-          0.0,
-          1.0,
-          0.4,
-          0.4,
+          1.0, 
 
-          // Three triangles on the left side
-          -0.75,
-          1.0,
-          -4.0,
-          0.4,
-          1.0,
-          0.4, // The back green one
-          -1.25,
-          -1.0,
-          -4.0,
-          0.4,
-          1.0,
-          0.4,
-          -0.25,
-          -1.0,
-          -4.0,
-          1.0,
-          0.4,
-          0.4,
-
-          -0.75,
-          1.0,
-          -2.0,
-          1.0,
-          1.0,
-          0.4, // The middle yellow one
-          -1.25,
-          -1.0,
-          -2.0,
-          1.0,
-          1.0,
-          0.4,
-          -0.25,
-          -1.0,
-          -2.0,
-          1.0,
-          0.4,
-          0.4,
-
-          -0.75,
-          1.0,
-          0.0,
-          0.4,
-          0.4,
-          1.0, // The front blue one
-          -1.25,
+          -0.5,
           -1.0,
           0.0,
           0.4,
           0.4,
           1.0,
-          -0.25,
+
+          0.5,
           -1.0,
           0.0,
           1.0,
           0.4,
           0.4,
         ])
-
         console.log('verticesColors', verticesColors)
-
-        var n = 18
-
+        var n = 9
         var vertexColorBuffer = gl.createBuffer()
-        console.log(vertexColorBuffer)
         if (!vertexColorBuffer) {
           console.log('Failed to create the buffer object')
           return -1
         }
         gl.bindBuffer(gl.ARRAY_BUFFER, vertexColorBuffer)
         gl.bufferData(gl.ARRAY_BUFFER, verticesColors, gl.STATIC_DRAW)
-
         var FSIZE = verticesColors.BYTES_PER_ELEMENT
-
         var a_Position = gl.getAttribLocation(gl.program, 'a_Position')
-
-        console.log(a_Position)
         gl.vertexAttribPointer(a_Position, 3, gl.FLOAT, false, FSIZE * 6, 0)
-
         gl.enableVertexAttribArray(a_Position)
-
         var a_Color = gl.getAttribLocation(gl.program, 'a_Color')
         gl.vertexAttribPointer(
           a_Color,
@@ -223,9 +150,7 @@
           FSIZE * 6,
           FSIZE * 3
         )
-
         gl.enableVertexAttribArray(a_Color)
-
         return n
       }
     </script>

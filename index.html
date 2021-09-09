@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
   </head>
+
   <body onLoad="main()">
     <canvas id="example" width="700" height="700"></canvas>
     <script src="./lib/webgl-utils.js"></script>
@@ -30,6 +31,7 @@
             gl_FragColor = v_Color;
         }
         `
+
       function main() {
         var canvas = document.getElementById('example')
         if (!canvas) {
@@ -56,77 +58,34 @@
         projMatrix.setPerspective(30, canvas.width / canvas.height, 1, 100)
         mvpMatrix.set(projMatrix).multiply(viewMatrix).multiply(modelMatrix)
         gl.uniformMatrix4fv(u_MvpMatrix, false, mvpMatrix.elements)
-        gl.clear(gl.COLOR_BUFFER_BIT)
+        gl.enable(gl.DEPTH_TEST)
+        gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT)
         gl.drawArrays(gl.TRIANGLES, 0, n)
         modelMatrix.setTranslate(-0.75, 0, 0)
         mvpMatrix.set(projMatrix).multiply(viewMatrix).multiply(modelMatrix)
         gl.uniformMatrix4fv(u_MvpMatrix, false, mvpMatrix.elements)
         gl.drawArrays(gl.TRIANGLES, 0, n)
       }
+
       function initVertexBuffers(gl) {
         var verticesColors = new Float32Array([
-          0.0,
-          1.0,
-          -4.0,
-          0.4,
-          1.0,
-          0.4, 
+        0.0, 1.0, 0.0, 0.4, 0.4, 1.0,
 
-          -0.5,
-          -1.0,
-          -4.0,
-          0.4,
-          1.0,
-          0.4,
+          -0.5, -1.0, 0.0, 0.4, 0.4, 1.0,
 
-          0.5,
-          -1.0,
-          -4.0,
-          1.0,
-          0.4,
-          0.4,
+          0.5, -1.0, 0.0, 1.0, 0.4, 0.4, //blue
 
-          0.0,
-          1.0,
-          -2.0,
-          1.0,
-          1.0,
-          0.4, 
+          0.0, 1.0, -2.0, 1.0, 1.0, 0.4,
 
-          -0.5,
-          -1.0,
-          -2.0,
-          1.0,
-          1.0,
-          0.4,
+          -0.5, -1.0, -2.0, 1.0, 1.0, 0.4,
 
-          0.5,
-          -1.0,
-          -2.0,
-          1.0,
-          0.4,
-          0.4,
+          0.5, -1.0, -2.0, 1.0, 0.4, 0.4, //yellow
 
-          0.0,
-          1.0,
-          0.0,
-          0.4,
-          0.4,
-          1.0, 
+          0.0, 1.0, -4.0, 0.4, 1.0, 0.4,
 
-          -0.5,
-          -1.0,
-          0.0,
-          0.4,
-          0.4,
-          1.0,
+          -0.5, -1.0, -4.0, 0.4, 1.0, 0.4,
 
-          0.5,
-          -1.0,
-          0.0,
-          1.0,
-          0.4,
-          0.4,
+          0.5, -1.0, -4.0, 1.0, 0.4, 0.4, //green
         ])
         console.log('verticesColors', verticesColors)
         var n = 9

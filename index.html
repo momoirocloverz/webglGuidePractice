@@ -18,10 +18,10 @@
         var VSHADER_SOURCE = `
         attribute vec4 a_Position;
         attribute vec4 a_Color;
-        uniform mat4 u_ViewProjMatrix;
+        uniform mat4 u_MvpMatrix;
         varying vec4 v_Color;
         void main(){
-            gl_Position = u_ViewProjMatrix *a_Position;
+            gl_Position = u_MvpMatrix *a_Position;
             v_Color = a_Color;
         }
         `
@@ -51,79 +51,106 @@
             gl.clearColor(0.0, 0.0, 0.0, 1.0)
             gl.enable(gl.DEPTH_TEST)
 
-            var u_ViewProjMatrix = gl.getUniformLocation(
+            var u_MvpMatrix = gl.getUniformLocation(
                 gl.program,
-                'u_ViewProjMatrix'
+                'u_MvpMatrix'
             )
             var mvpMatrix = new Matrix4()
             mvpMatrix.setPerspective(30, 1, 1, 100)
 
             mvpMatrix.lookAt(3, 3, 7, 0, 0, 0, 0, 1, 0)
 
-            gl.uniformMatrix4fv(u_ViewProjMatrix, false, viewProjMatrix.elements)
+            gl.uniformMatrix4fv(u_MvpMatrix, false, mvpMatrix.elements)
 
             gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT)
 
-            gl.enable(gl.POLYGON_OFFSET_FILL)
-
-            gl.drawArrays(gl.TRIANGLES, 0, n / 2)
-
-            gl.polygonOffset(1.0, 1.0)
-
-            gl.drawArrays(gl.TRIANGLES, n / 2, n / 2)
+            gl.drawElements(gl.TRIANGLES, gl.UNSIGNED_BYTE, 0)
         }
 
         function initVertexBuffers(gl) {
             var verticesColors = new Float32Array([
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+
+                -1.0,
+                1.0,
+                1.0,
+                1.0,
                 0.0,
-                2.5,
-                -5.0,
-                0.4,
-                1.0,
-                0.4,
+                1.4,
 
-                -2.5,
-                -2.5,
-                -5.0,
-                0.4,
+                -1.0,
+                -1.0,
                 1.0,
-                0.4,
-
-                2.5,
-                -2.5,
-                -5.0,
                 1.0,
-                0.4,
-                0.4, //blue
-
                 0.0,
-                3.0,
-                -5.0,
-                1.0,
-                0.4,
-                0.4,
+                0.1, //blue
 
-                -3.0,
-                -3.0,
-                -5.0,
+                1.0,
+                -1.0,
                 1.0,
                 1.0,
-                0.4,
+                1.0,
+                0.0,
 
-                3.0,
-                -3.0,
-                -5.0,
+                1.0,
+                -1.0,
+                -1.0,
+                0.0,
+                1.0,
+                0.0,
+
                 1.0,
                 1.0,
-                0.4, //yellow
+                -1.0,
+                0.0,
+                1.0,
+                1.0, //yellow
+
+
+                -1.0,
+                1.0,
+                -1.0,
+                0.0,
+                1.0,
+                1.0,
+
+                -1.0,
+                -1.0,
+                -1.0,
+                0.0,
+                0.0,
+                0.0, //yellow
             ])
             console.log('verticesColors', verticesColors)
+
+
+            var indices = new Uint8Array([
+                0,1,2, 0,2,3,
+                0,3,4,0,4,5,
+                0,5,6,0,6,1,
+                1,6,7,1,7,2,
+                7,4,3,7,3,2,
+                4,7,6,4,6,5
+            ])
+
             var n = 6
             var vertexColorBuffer = gl.createBuffer()
+            var indexBuffer = gl.createBuffer()
             if (!vertexColorBuffer) {
                 console.log('Failed to create the buffer object')
                 return -1
             }
+            if (!indexBuffer) {
+                console.log('Failed to create the buffer object')
+                return -1
+            }
+
+
             gl.bindBuffer(gl.ARRAY_BUFFER, vertexColorBuffer)
             gl.bufferData(gl.ARRAY_BUFFER, verticesColors, gl.STATIC_DRAW)
             var FSIZE = verticesColors.BYTES_PER_ELEMENT

@@ -20,14 +20,22 @@
         attribute vec4 a_Color;
         attribute vec4 a_Normal;
         uniform mat4 u_MvpMatrix;
+        uniform vec3 u_DiffuseLight;
         uniform mat4 u_NormalMatrix;
+        uniform vec3 u_LightColor;
         uniform vec3 u_LightDirection;
+        uniform vec3 u_AmbientLight;
         varying vec4 v_Color;
         void main(){
             gl_Position = u_MvpMatrix *a_Position;
-            vec4 normal =  u_NormalMatrix*a_Normal;
-            float nDotL = max( dot(u_LightDirection,normalize(normal.xyz) ),0.0 );          
-            v_Color = vec4( a_Color.xyz*nDotL ,a_Color.a);
+            vec3 normal =  normalize(  vec3 ( u_NormalMatrix *a_Normal ) );
+
+            float nDotL = max( dot(u_LightDirection, normal ),0.0 );          
+            vec3 diffuse = u_LightColor * a_Color.rgb*nDotL;
+
+            vec3 ambient = u_AmbientLight * a_Color.rgb;
+
+            v_Color = vec4( diffuse + ambient ,a_Color.a);
         }
         `
         var FSHADER_SOURCE = `
@@ -59,42 +67,63 @@
                 gl.program,
                 'u_MvpMatrix'
             )
+            var u_DiffuseLight = gl.getUniformLocation(gl.program, 'u_DiffuseLight')
+            var u_AmbientLight = gl.getUniformLocation(gl.program, 'u_AmbientLight')
+            var u_LightColor = gl.getUniformLocation(gl.program, 'u_LightColor')
             var u_NormalMatrix = gl.getUniformLocation(gl.program, 'u_NormalMatrix')
             var u_LightDirection = gl.getUniformLocation(gl.program, 'u_LightDirection')
 
+            gl.uniform3f(u_LightColor, 1.0, 1.0, 1.0)
+            // var vpMatrix = new Matrix4()
 
-
-            var vpMatrix = new Matrix4()
-            vpMatrix.setPerspective(30, canvas.width / canvas.height, 1, 100)
-            vpMatrix.lookAt(3, 3, 7, 0, 0, 0, 0, 1, 0)
-
-
-            var lightDirection = new Vector3([0.5, 3.0, 4.0])
-
+            var lightDirection = new Vector3([0.0, 3.0, 4.0])
             lightDirection.normalize()
             gl.uniform3fv(u_LightDirection, lightDirection.elements)
+            gl.uniform3f(u_AmbientLight, 0.2, 0.2, 0.2)
 
-            var currentAngle = 0.0;
+            // var currentAngle = 0.0;
             var modelMatrix = new Matrix4()
             var mvpMatrix = new Matrix4()
             var normalMatrix = new Matrix4()
 
-            var tick = function () {
-                currentAngle = animate(currentAngle)
-                modelMatrix.setRotate(currentAngle, 0, 1, 0)
-                mvpMatrix.set(vpMatrix).multiply(modelMatrix)
-                gl.uniformMatrix4fv(u_MvpMatrix, false, mvpMatrix.elements)
-                normalMatrix.setInverseOf(modelMatrix)
-                normalMatrix.transpose()
-                gl.uniformMatrix4fv(u_NormalMatrix, false, normalMatrix.elements)
 
-                gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT)
+            modelMatrix.setTranslate(0, 0.9, 0)
+            modelMatrix.lookAt(3, 3, 7, 0, 0, 0, 0, 1, 0)
 
-                gl.drawElements(gl.TRIANGLES, n, gl.UNSIGNED_BYTE, 0)
-                requestAnimationFrame(tick, canvas)
 
-            }
-            tick()
+            mvpMatrix.setPerspective(30, canvas.width / canvas.height, 1, 100)
+            mvpMatrix.lookAt(3, 3, 7, 0, 0, 0, 0, 1, 0)
+
+
+
+            mvpMatrix.multiply(modelMatrix)
+
+            gl.uniformMatrix4fv(u_MvpMatrix, false, mvpMatrix.elements)
+
+            normalMatrix.setInverseOf(modelMatrix)
+
+            normalMatrix.transpose()
+
+            gl.uniformMatrix4fv(u_NormalMatrix, false, normalMatrix.elements)
+
+
+
+            // var tick = function () {
+            //     currentAngle = animate(currentAngle)
+            //     modelMatrix.setRotate(currentAngle, 0, 1, 0)
+            //     mvpMatrix.set(vpMatrix).multiply(modelMatrix)
+            //     gl.uniformMatrix4fv(u_MvpMatrix, false, mvpMatrix.elements)
+            //     normalMatrix.setInverseOf(modelMatrix)
+            //     normalMatrix.transpose()
+            //     gl.uniformMatrix4fv(u_NormalMatrix, false, normalMatrix.elements)
+
+            gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT)
+
+            gl.drawElements(gl.TRIANGLES, n, gl.UNSIGNED_BYTE, 0)
+            //     requestAnimationFrame(tick, canvas)
+
+            // }
+            // tick()
         }
 
         function draw(gl, nangle, vpMatrix, u_MvpMatrix, u_NormalMatrix) {

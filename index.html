@@ -66,30 +66,43 @@
                 gl.program,
                 'u_MvpMatrix'
             )
-            var u_DiffuseLight = gl.getUniformLocation(gl.program, 'u_DiffuseLight')
-            var u_AmbientLight = gl.getUniformLocation(gl.program, 'u_AmbientLight')
-            var u_LightColor = gl.getUniformLocation(gl.program, 'u_LightColor')
             var u_NormalMatrix = gl.getUniformLocation(gl.program, 'u_NormalMatrix')
-            var u_LightDirection = gl.getUniformLocation(gl.program, 'u_LightDirection')
+            var u_LightColor = gl.getUniformLocation(gl.program, 'u_LightColor')
+            var u_LightPosition = gl.getUniformLocation(gl.program, 'u_LightPosition')
+
+
+            // var u_DiffuseLight = gl.getUniformLocation(gl.program, 'u_DiffuseLight')
+            var u_AmbientLight = gl.getUniformLocation(gl.program, 'u_AmbientLight')
+
+
+            // var u_LightDirection = gl.getUniformLocation(gl.program, 'u_LightDirection')
 
             gl.uniform3f(u_LightColor, 1.0, 1.0, 1.0)
             // var vpMatrix = new Matrix4()
-
-            var lightDirection = new Vector3([0.0, 3.0, 4.0])
-            lightDirection.normalize()
-            gl.uniform3fv(u_LightDirection, lightDirection.elements)
+            gl.uniform3f(u_LightPosition, 2.3, 4.0, 3.5)
             gl.uniform3f(u_AmbientLight, 0.2, 0.2, 0.2)
+
+
+            // var lightDirection = new Vector3([0.0, 3.0, 4.0])
+            // lightDirection.normalize()
+            // gl.uniform3fv(u_LightDirection, lightDirection.elements)
+            // gl.uniform3f(u_AmbientLight, 0.2, 0.2, 0.2)
 
             // var currentAngle = 0.0;
             var modelMatrix = new Matrix4()
             var mvpMatrix = new Matrix4()
             var normalMatrix = new Matrix4()
 
-            modelMatrix.setTranslate(0, 0.9, 0)
-            modelMatrix.rotate(90, 0, 0, 1)
+            modelMatrix.setRotate(90, 0, 1, 0)
+            gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements)
 
-            mvpMatrix.setPerspective(30, canvas.width / canvas.height, 1, 100)
-            mvpMatrix.lookAt(3, 3, 7, 0, 0, 0, 0, 1, 0)
+            mvpMatrix.setPerspective(20, canvas.width / canvas.height, 1, 100)
+
+            // modelMatrix.setTranslate(0, 0.9, 0)
+            // modelMatrix.rotate(90, 0, 0, 1)
+
+            // mvpMatrix.setPerspective(30, canvas.width / canvas.height, 1, 100)
+            mvpMatrix.lookAt(6, 6, 14, 0, 0, 0, 0, 1, 0)
 
 
 
@@ -110,30 +123,30 @@
         }
         function initVertexBuffers(gl) {
             var vertices = new Float32Array([
-                1.0, 1.0, 1.0, -1.0, 1.0, 1.0, -1.0, -1.0, 1.0, 1.0, -1.0, 1.0, // v0-v1-v2-v3 front
-                1.0, 1.0, 1.0, 1.0, -1.0, 1.0, 1.0, -1.0, -1.0, 1.0, 1.0, -1.0, // v0-v3-v4-v5 right
-                1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, 1.0, -1.0, -1.0, 1.0, 1.0, // v0-v5-v6-v1 up
-                -1.0, 1.0, 1.0, -1.0, 1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, 1.0, // v1-v6-v7-v2 left
-                -1.0, -1.0, -1.0, 1.0, -1.0, -1.0, 1.0, -1.0, 1.0, -1.0, -1.0, 1.0, // v7-v4-v3-v2 down
-                1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, 1.0, -1.0, 1.0, 1.0, -1.0 // v4-v7-v6-v5 back
+                2.0, 2.0, 2.0, -2.0, 2.0, 2.0, -2.0, -2.0, 2.0, 2.0, -2.0, 2.0, // v0-v1-v2-v3 front
+                2.0, 2.0, 2.0, 2.0, -2.0, 2.0, 2.0, -2.0, -2.0, 2.0, 2.0, -2.0, // v0-v3-v4-v5 right
+                2.0, 2.0, 2.0, 2.0, 2.0, -2.0, -2.0, 2.0, -2.0, -2.0, 2.0, 2.0, // v0-v5-v6-v1 up
+                -2.0, 2.0, 2.0, -2.0, 2.0, -2.0, -2.0, -2.0, -2.0, -2.0, -2.0, 2.0, // v1-v6-v7-v2 left
+                -2.0, -2.0, -2.0, 2.0, -2.0, -2.0, 2.0, -2.0, 2.0, -2.0, -2.0, 2.0, // v7-v4-v3-v2 down
+                2.0, -2.0, -2.0, -2.0, -2.0, -2.0, -2.0, 2.0, -2.0, 2.0, 2.0, -2.0  // v4-v7-v6-v5 back
             ])
 
             var colors = new Float32Array([
-                1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, // v0-v1-v2-v3 front
-                1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, // v0-v3-v4-v5 right
-                1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, // v0-v5-v6-v1 up
-                1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, // v1-v6-v7-v2 left
-                1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, // v7-v4-v3-v2 down
-                1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 // v4-v7-v6-v5 back
+                1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0,     // v0-v1-v2-v3 front
+                1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0,     // v0-v3-v4-v5 right
+                1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0,     // v0-v5-v6-v1 up
+                1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0,     // v1-v6-v7-v2 left
+                1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0,     // v7-v4-v3-v2 down
+                1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0　    // v4-v7-v6-v5 back
             ])
 
             var normals = new Float32Array([ // Normal
-                0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, // v0-v1-v2-v3 front
-                1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, // v0-v3-v4-v5 right
-                0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, // v0-v5-v6-v1 up
-                -1.0, 0.0, 0.0, -1.0, 0.0, 0.0, -1.0, 0.0, 0.0, -1.0, 0.0, 0.0, // v1-v6-v7-v2 left
-                0.0, -1.0, 0.0, 0.0, -1.0, 0.0, 0.0, -1.0, 0.0, 0.0, -1.0, 0.0, // v7-v4-v3-v2 down
-                0.0, 0.0, -1.0, 0.0, 0.0, -1.0, 0.0, 0.0, -1.0, 0.0, 0.0, -1.0 // v4-v7-v6-v5 back
+                0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0,  // v0-v1-v2-v3 front
+                1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0,  // v0-v3-v4-v5 right
+                0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0,  // v0-v5-v6-v1 up
+                -1.0, 0.0, 0.0, -1.0, 0.0, 0.0, -1.0, 0.0, 0.0, -1.0, 0.0, 0.0,  // v1-v6-v7-v2 left
+                0.0, -1.0, 0.0, 0.0, -1.0, 0.0, 0.0, -1.0, 0.0, 0.0, -1.0, 0.0,  // v7-v4-v3-v2 down
+                0.0, 0.0, -1.0, 0.0, 0.0, -1.0, 0.0, 0.0, -1.0, 0.0, 0.0, -1.0   // v4-v7-v6-v5 back
             ]);
 
 

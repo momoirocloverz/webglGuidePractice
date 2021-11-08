@@ -31,7 +31,7 @@
             vec3 normal =  normalize(  vec3 ( u_NormalMatrix *a_Normal ) );
             vec4 vertexPosition = u_ModelMatrix * a_Position;
             vec3 lightDirection = normalize( u_LightPosition -vec3(vertexPosition) );
-            float nDotL = max( dot(lightDirection, normal ),0.0 );          
+            float nDotL = max( dot( normal, lightDirection ),0.0 );          
             vec3 diffuse = u_LightColor * a_Color.rgb*nDotL;
             vec3 ambient = u_AmbientLight * a_Color.rgb;
             v_Color = vec4( diffuse + ambient ,a_Color.a);
@@ -72,27 +72,51 @@
 
             var u_AmbientLight = gl.getUniformLocation(gl.program, 'u_AmbientLight')
 
+            var vpMatrix = new Matrix4()
+            vpMatrix.setPerspective(30, canvas.width / canvas.height, 1, 100)
+            vpMatrix.lookAt(6, 6, 14, 0, 0, 0, 0, 1, 0)
+
             gl.uniform3f(u_LightColor, 1.0, 1.0, 1.0)
             gl.uniform3f(u_LightPosition, 2.3, 4.0, 3.5)
             gl.uniform3f(u_AmbientLight, 0.2, 0.2, 0.2)
+
+            var currentAngle = 0.0;
 
             var modelMatrix = new Matrix4()
             var mvpMatrix = new Matrix4()
             var normalMatrix = new Matrix4()
 
-            modelMatrix.setRotate(170, 0, 1, 0)
-            gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements)
-            mvpMatrix.setPerspective(30, canvas.width / canvas.height, 1, 100)
-            mvpMatrix.lookAt(4, 6, 14, 0, 0, 0, 0, 1, 0)
-            mvpMatrix.multiply(modelMatrix)
-            gl.uniformMatrix4fv(u_MvpMatrix, false, mvpMatrix.elements)
-            normalMatrix.setInverseOf(modelMatrix)
-            normalMatrix.transpose()
-            gl.uniformMatrix4fv(u_NormalMatrix, false, normalMatrix.elements)
 
-            gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT)
 
-            gl.drawElements(gl.TRIANGLES, n, gl.UNSIGNED_BYTE, 0)
+            var tick = function () {
+                currentAngle = animate(currentAngle)
+                modelMatrix.setRotate(currentAngle, 0, 1, 0)
+                gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements)
+
+                mvpMatrix.set(vpMatrix).multiply(modelMatrix)
+                gl.uniformMatrix4fv(u_MvpMatrix, false, mvpMatrix.elements)
+
+                normalMatrix.setInverseOf(modelMatrix)
+                normalMatrix.transpose()
+                gl.uniformMatrix4fv(u_NormalMatrix, false, normalMatrix.elements)
+
+                gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT)
+
+                gl.drawElements(gl.TRIANGLES, n, gl.UNSIGNED_BYTE, 0)
+
+                requestAnimationFrame( tick,canvas )
+
+
+            }
+            tick()
+
+
+
+
+
+
+
+
         }
         function initVertexBuffers(gl) {
             var vertices = new Float32Array([
@@ -172,6 +196,19 @@
             return true
 
         }
+        var ANGLE_STEP = 30.0;
+        var g_last = Date.now()
+        function animate(angle){
+            var now = Date.now()
+            var elapsed = now - g_last
+            g_last = now;
+
+            var newAngle = angle + (ANGLE_STEP * elapsed)/1000.0
+
+            return newAngle %= 360
+
+        }
+
     </script>
 </body>
 

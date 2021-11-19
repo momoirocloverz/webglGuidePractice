@@ -48,7 +48,7 @@
         varying vec4 v_Color;
         void main(){            
             vec3 normal = normalize(v_Normal);
-            vec3 lightDirection = normaloze( u_LightPosition - v_Position );
+            vec3 lightDirection = normalize( u_LightPosition - v_Position );
             float nDotL = max( dot( lightDirection,normal ),0.0 );
             vec3 diffuse = u_LightColor * v_Color.rgb * nDotL;
             vec3 ambient = u_AmbientLight * v_Color.rgb;
@@ -121,14 +121,13 @@
 
 
 
-
-            // Calculate the matrix to transform the normal based on the model matrix
             normalMatrix.setInverseOf(modelMatrix);
             normalMatrix.transpose();
             // Pass the transformation matrix for normals to u_NormalMatrix
 
 
             gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
+
             gl.uniformMatrix4fv(u_MvpMatrix, false, mvpMatrix.elements);
 
 

@@ -66,7 +66,7 @@
                 return;
             }
             gl.clearColor(0.0, 0.0, 0.0, 1.0);
-            gl.clear(gl.DEPTH_TEST);
+            gl.enable(gl.DEPTH_TEST);
 
 
             var u_MvpMatrix = gl.getUniformLocation(gl.program, 'u_MvpMatrix')
@@ -84,21 +84,10 @@
             }
 
             draw(gl, n, viewProjMatrix, u_MvpMatrix, u_NormalMatrix)
-
-
         }
-
-
         var ANGLE_STEP = 3.0;
         var g_arm1Angle = -90.0;
         var g_joint1Angle = 0.0;
-
-
-
-
-
-
-
         function initVertexBuffers(gl) { // Create a sphere
             var vertices = new Float32Array([
                 1.5, 10.0, 1.5,
@@ -136,9 +125,27 @@
 
             gl.bindBuffer(gl.ARRAY_BUFFER, null)
 
+            var indexBuffer = gl.createBuffer()
+
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer)
+
+            gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW)
+
+            return indices.length
+
         }
 
         function initArrayBuffer(gl, attribute, data, type, num) {
+            var buffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
+            gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW)
+
+            var a_attribute = gl.getAttribLocation(gl.program, attribute)
+
+            gl.vertexAttribPointer(a_attribute, num, type, false, 0, 0)
+            gl.enableVertexAttribArray(a_attribute)
+
+            return true
 
         }
 
@@ -172,7 +179,25 @@
 
         }
 
-        function draw() {
+        var g_modelMatrix = new Matrix4()
+        var g_mvpMatrix = new Matrix4()
+
+        function draw(gl, n, viewProjMatrix, u_MvpMatrix, u_NormalMatrix) {
+            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+
+            var arm1Length = 10.0;
+            g_modelMatrix.setTranslate(0.0, -12.0, 0.0)
+            g_modelMatrix.rotate(g_arm1Angle, 0.0, 1.0, 0.0)
+            drawBox(gl, n, viewProjMatrix, u_MvpMatrix, u_NormalMatrix)
+
+
+
+
+
+        }
+        var g_normalMatrix = new Matrix4()
+
+        function drawBox(gl,n,viewProjMatrix,u_MvpMatrix,u_NormalMatrix){
 
         }
 

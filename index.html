@@ -190,14 +190,23 @@
             g_modelMatrix.rotate(g_arm1Angle, 0.0, 1.0, 0.0)
             drawBox(gl, n, viewProjMatrix, u_MvpMatrix, u_NormalMatrix)
 
+            g_modelMatrix.translate(0.0, arm1Length, 0.0)
+            g_modelMatrix.rotate(g_joint1Angle, 0.0, 0.0, 1.0)
+            g_modelMatrix.scale(1.3, 1.0, 1.3)
 
-
+            drawBox(gl, n, viewProjMatrix, u_MvpMatrix, u_NormalMatrix)
 
 
         }
         var g_normalMatrix = new Matrix4()
 
-        function drawBox(gl,n,viewProjMatrix,u_MvpMatrix,u_NormalMatrix){
+        function drawBox(gl, n, viewProjMatrix, u_MvpMatrix, u_NormalMatrix) {
+            g_mvpMatrix.set(viewProjMatrix)
+            g_mvpMatrix.multiply(g_modelMatrix)
+            gl.uniformMatrix4fv(u_MvpMatrix, false, g_mvpMatrix.transpose())
+            gl.uniformMatrix4fv(u_NormalMatrix, false, g_normalMatrix.elements)
+
+            gl.drawElements(gl.TRIANGLES, n, gl.UNSIGNED_BYTE, 0)
 
         }
 

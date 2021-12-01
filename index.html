@@ -6,10 +6,16 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+    </style>
 </head>
 
 <body onLoad="main()">
-    <canvas id="example" width="1000" height="1000"></canvas>
+    <canvas id="example" width="800" height="590"></canvas>
     <script src="./lib/webgl-utils.js"></script>
     <script src="./lib/webgl-debug.js"></script>
     <script src="./lib/cuon-utils.js"></script>
@@ -175,7 +181,7 @@
 
                 default: return;
             }
-            draw(gl, n,viewProjMatrix, u_MvpMatrix, u_NormalMatrix)
+            draw(gl, n, viewProjMatrix, u_MvpMatrix, u_NormalMatrix)
 
         }
 
@@ -189,7 +195,7 @@
             g_modelMatrix.setTranslate(0.0, -12.0, 0.0)
             g_modelMatrix.rotate(g_arm1Angle, 0.0, 1.0, 0.0)
             drawBox(gl, n, viewProjMatrix, u_MvpMatrix, u_NormalMatrix)
-
+            console.log( 'arm1Length',arm1Length )
             g_modelMatrix.translate(0.0, arm1Length, 0.0)
             g_modelMatrix.rotate(g_joint1Angle, 0.0, 0.0, 1.0)
             g_modelMatrix.scale(1.3, 1.0, 1.3)
@@ -203,9 +209,9 @@
         function drawBox(gl, n, viewProjMatrix, u_MvpMatrix, u_NormalMatrix) {
             g_mvpMatrix.set(viewProjMatrix)
             g_mvpMatrix.multiply(g_modelMatrix)
-       
+
             gl.uniformMatrix4fv(u_MvpMatrix, false, g_mvpMatrix.elements)
-            g_normalMatrix.setInverseOf( g_modelMatrix )
+            g_normalMatrix.setInverseOf(g_modelMatrix)
             g_normalMatrix.transpose()
             gl.uniformMatrix4fv(u_NormalMatrix, false, g_normalMatrix.elements)
             gl.drawElements(gl.TRIANGLES, n, gl.UNSIGNED_BYTE, 0)

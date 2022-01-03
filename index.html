@@ -15,15 +15,30 @@
 
   <body>
     <script src="./lib/three.min.js"></script>
-    <!-- <canvas id="example" width="800" height="590"></canvas> -->
 
-    <script >
-        const scene = new THREE.Scene()
-        const camera = new THREE.PerspectiveCamera( 75, window.innerWidth, window.innerHeight, 0.1,1000 )
-        const renderer = new THREE.WebGLRenderer()
-        renderer.setSize( window.innerWidth,window.innerHeight )
-        document.body.appendChild( renderer.domElement )
+    <script>
+      const scene = new THREE.Scene()
+      const camera = new THREE.OrthographicCamera(
+        -1,
+        1,
+        1,
+        -1,
+        0.1,
+        10
+      )
+      const renderer = new THREE.WebGLRenderer()
+      renderer.setSize(window.innerWidth, window.innerHeight)
+      document.body.appendChild(renderer.domElement)
 
+      const geometry = new THREE.PlaneGeometry(2, 2)
+      const material = new THREE.ShaderMaterial()
+      const plane = new THREE.Mesh(geometry, material)
+      scene.add(plane)
+      camera.position.z = 1
+      renderer.render( scene, camera )
+
+
+      
     </script>
   </body>
 </html>

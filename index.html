@@ -1,44 +1,71 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
     <style>
-      * {
-        padding: 0;
-        margin: 0;
-      }
+        * {
+            padding: 0;
+            margin: 0;
+        }
     </style>
-  </head>
+</head>
 
-  <body>
+<body>
+    <!-- https://codepen.io/nik-lever -->
     <script src="./lib/three.min.js"></script>
 
     <script>
-      const scene = new THREE.Scene()
-      const camera = new THREE.OrthographicCamera(
-        -1,
-        1,
-        1,
-        -1,
-        0.1,
-        10
-      )
-      const renderer = new THREE.WebGLRenderer()
-      renderer.setSize(window.innerWidth, window.innerHeight)
-      document.body.appendChild(renderer.domElement)
+        const scene = new THREE.Scene()
+        // const camera = new THREE.OrthographicCamera(
+        //     -1,
+        //     1,
+        //     1,
+        //     -1,
+        //     0.1,
+        //     10
+        // )
+        const camera = new THREE.PerspectiveCamera(10, window.innerWidth / window.innerHeight, 0.1, 100);
+        const renderer = new THREE.WebGLRenderer()
+        renderer.setSize(window.innerWidth, window.innerHeight)
+        document.body.appendChild(renderer.domElement)
 
-      const geometry = new THREE.PlaneGeometry(2, 2)
-      const material = new THREE.ShaderMaterial()
-      const plane = new THREE.Mesh(geometry, material)
-      scene.add(plane)
-      camera.position.z = 1
-      renderer.render( scene, camera )
+        // gl_Position = projectionMatrix * modelViewMatrix * vec4( 1.0,1.0,1.0,1.0 );       
+        const vertexShader = `
+        // varying vec4 vPosition;
+        // varying vec3 position;
+        void main() {           
+            gl_Position = projectionMatrix * modelViewMatrix * vec4( position,1.0 );
+        }
+        `
+        // gl_PointSize = 10.0;
+
+        const fragmentShader = `
+        // varying vec4 vPosition;
+        // varying vec3 position;
+        void main() {
+             gl_FragColor = vec4( 1.0,1.0,0.0,1.0 );            
+        }
+        `
 
 
-      
+        const geometry = new THREE.PlaneGeometry(2, 2)
+        const material = new THREE.ShaderMaterial({
+            vertexShader: vertexShader,
+            fragmentShader: fragmentShader,
+        })
+        const plane = new THREE.Mesh(geometry, material)
+        scene.add(plane)
+        camera.position.z = 20;
+
+        renderer.render(scene, camera)
+        console.log('plane', plane)
+
+
     </script>
-  </body>
+</body>
+
 </html>

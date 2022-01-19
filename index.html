@@ -18,6 +18,8 @@
     <!-- https://codepen.io/nik-lever -->
     <script src="./lib/three.min.js"></script>
     <script>
+        // console.log( 'PointerLockControls',PointerLockControls )
+        // import { PointerLockControls } from './jsm/controls/PointerLockControls.js';
         const scene = new THREE.Scene()
         // const camera = new THREE.OrthographicCamera(
         //     -1,
@@ -95,10 +97,10 @@
             // plane.rotation.y = int3
             // plane.rotation.x = int4
             // plane.rotation.z = int4
-            // renderer.render(scene, camera)
-            // requestAnimationFrame(tick)
+            renderer.render(scene, camera)
+            requestAnimationFrame(tick)
         }
-        // tick()
+        tick()
     </script>
 </body>
 

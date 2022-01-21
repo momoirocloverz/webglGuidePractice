@@ -17,6 +17,8 @@ export default {
    
     })
     const initAction = ()=>{
+        console.log( window.innerHeight )
+        console.log(  )
                 const scene = new THREE.Scene()
         // const camera = new THREE.OrthographicCamera(
         //     -1,
@@ -32,6 +34,7 @@ export default {
             alpha: true
         })
         renderer.setSize(window.innerWidth, window.innerHeight)
+        renderer.setPixelRatio( window.devicePixelRatio*2 )
         document.body.appendChild(renderer.domElement)
         const axesHelper = new THREE.AxesHelper(3);
         scene.add(axesHelper);
@@ -66,7 +69,7 @@ export default {
             let track1X = e.clientX - window.innerWidth / 2
             let track2X = track1X / (window.innerWidth)
             let resX = Math.sin(Math.PI * track2X)
-            camera.position.x = resX
+            camera.position.x = resX*3
             // console.log('track2X', track2X)
             let track1Y = e.clientY - window.innerHeight / 2
             let track2Y = track1Y / (window.innerHeight)
@@ -74,8 +77,8 @@ export default {
             // console.log(resX, resY)
             // console.log('track1Y', track1Y)
             // console.log('track2Y', track2Y)
-            console.log('resY', resY)
-            camera.position.y = resY
+            // console.log('resY', resY)
+            camera.position.y = resY*3
             renderer.render(scene, camera)
         })
         var int1 = 10;

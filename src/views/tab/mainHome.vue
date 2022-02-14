@@ -1,119 +1,98 @@
 <template>
   <div class="realHome">
-  
+    <canvas class="webgl"></canvas>
   </div>
 </template>
 
 <script>
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import * as THREE from 'three';
+import * as THREE from 'three'
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import * as dat from 'lil-gui'
 
 export default {
   setup() {
     const Router = useRouter()
     const Route = useRoute()
-    const state = reactive({
-   
-    })
-    const initAction = ()=>{
-        console.log( window.innerHeight )
-        console.log(  )
-                const scene = new THREE.Scene()
-        // const camera = new THREE.OrthographicCamera(
-        //     -1,
-        //     1,
-        //     1,
-        //     -1,
-        //     0.1,
-        //     10
-        // )
-        const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 100);
-        const renderer = new THREE.WebGLRenderer({
-            antialias: true,
-            alpha: true
-        })
-        renderer.setSize(window.innerWidth, window.innerHeight)
-        renderer.setPixelRatio( window.devicePixelRatio*2 )
-        document.body.appendChild(renderer.domElement)
-        const axesHelper = new THREE.AxesHelper(3);
-        scene.add(axesHelper);
-        // gl_Position = projectionMatrix * modelViewMatrix * vec4( 1.0,1.0,1.0,1.0 );       
-        const vertexShader = `
-        void main() {           
-            gl_Position = projectionMatrix * modelViewMatrix * vec4( position,1.0 );
-        }
-        `
-        const fragmentShader = `
-        
-        void main() {
-             gl_FragColor = vec4( 1.0,0.3,0.0,1.0 );            
-        }
-        `
-        // const geometry = new THREE.PlaneGeometry(2, 2)
+    const state = reactive({})
+    const gui = new dat.GUI()
+    const initAction = () => {
+      const canvas = document.querySelector('.webgl')
 
-        const geometry = new THREE.BoxGeometry(2, 2, 2)
-        const material = new THREE.ShaderMaterial({
-            vertexShader: vertexShader,
-            fragmentShader: fragmentShader,
+      const scene = new THREE.Scene()
+
+      const textureLoader = new THREE.TextureLoader()
+
+      const sphere = new THREE.Mesh(
+        new THREE.SphereGeometry(1, 32, 32),
+        new THREE.MeshStandardMaterial({
+          roughness: 0.7
         })
-        const plane = new THREE.Mesh(geometry, material)
-        scene.add(plane)
-        camera.position.z = 10;
-        camera.position.x = 4;
-        camera.position.y = 2;
-        // console.log( scene )
-        // console.log(geometry)
-        // console.log('plane', plane)
-        window.addEventListener('mousemove', (e) => {
-            let track1X = e.clientX - window.innerWidth / 2
-            let track2X = track1X / (window.innerWidth)
-            let resX = Math.sin(Math.PI * track2X)
-            camera.position.x = resX*3
-            // console.log('track2X', track2X)
-            let track1Y = e.clientY - window.innerHeight / 2
-            let track2Y = track1Y / (window.innerHeight)
-            let resY = Math.sin(Math.PI * track2Y)
-            // console.log(resX, resY)
-            // console.log('track1Y', track1Y)
-            // console.log('track2Y', track2Y)
-            // console.log('resY', resY)
-            camera.position.y = resY*3
-            renderer.render(scene, camera)
+      )
+
+      scene.add(sphere)
+      console.log('sphere', sphere)
+
+      const floor = new THREE.Mesh(
+        new THREE.PlaneGeometry(20, 20),
+        new THREE.MeshStandardMaterial({
+          color: '#a9c388'
         })
-        var int1 = 10;
-        var int2 = 0;
-        var int3 = 1.2;
-        var int4 = 5;
-        const tick = () => {
-            // int1 += 0.1;
-            // int2 += 0.1;
-            // int3 += 0.1;
-            // int4 += 0.1;
-            // console.log('int1', int1)
-            // plane.scale.x = int1
-            // plane.position.y = int2
-            // plane.scale.z = 4
-            // plane.rotation.y = int3
-            // plane.rotation.x = int4
-            // plane.rotation.z = int4
-            renderer.render(scene, camera)
-            requestAnimationFrame(tick)
-        }
-        tick()
+      )
+      scene.add(floor)
+      const ambientLight = new THREE.AmbientLight('#ffffff', 0.5)
+      gui.add(ambientLight, 'intensity').min(0).max(1).step(0.001)
+      scene.add(ambientLight)
+
+      const sizes = {
+        width: window.innerWidth,
+        height: window.innerHeight
+      }
+      console.log('sizes', sizes)
+
+      window.addEventListener('resize', () => {
+        sizes.width = window.innerWidth
+        sizes.height = window.innerHeight
+
+        camera.aspect = sizes.width / sizes.height
+        camera.updateProjectMatrix()
+        renderer.setSize(sizes.width, sizes.height)
+        renderer.setPixelRatio(window.devicePixelRatio * 2)
+      })
+
+      const camera = new THREE.PerspectiveCamera(50, sizes.width / sizes.height, 0.1, 100)
+      camera.position.x = 4
+      camera.position.y = 2
+      camera.position.z = 5
+
+      scene.add(camera)
+      const controls = new OrbitControls(camera, canvas)
+      controls.enableDamping = true
+      const renderer = new THREE.WebGLRenderer({
+        canvas,
+        antialias: true,
+        alpha: true
+      })
+      renderer.setSize(sizes.width, sizes.height)
+      renderer.setPixelRatio(window.devicePixelRatio * 2)
+      const clock = new THREE.Clock()
+      const tick = () => {
+        const elapsedTime = clock.getElapsedTime()
+        controls.update()
+        renderer.render(scene, camera)
+        window.requestAnimationFrame(tick)
+      }
+      tick()
     }
     onMounted(() => {
-
-initAction()
+      initAction()
     })
 
-
     return {
-      state,
+      state
     }
-  },
+  }
 }
 </script>
-<style lang="less" scoped>
-
-</style>
+<style lang="less" scoped></style>

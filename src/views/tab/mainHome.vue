@@ -45,6 +45,13 @@ export default {
       gui.add(ambientLight, 'intensity').min(0).max(1).step(0.001)
       scene.add(ambientLight)
 
+      const moonLight = new THREE.DirectionalLight('#ffffff', 0.5)
+      moonLight.position.set(4, 5, -2)
+
+      gui.add(moonLight, 'intensity').min(0).max(1).step(0.001)
+
+      scene.add(moonLight)
+
       const sizes = {
         width: window.innerWidth,
         height: window.innerHeight

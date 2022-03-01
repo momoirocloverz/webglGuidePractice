@@ -62,22 +62,16 @@
         camera.position.z = 10;
         camera.position.x = 4;
         camera.position.y = 2;
-        // console.log( scene )
-        // console.log(geometry)
-        // console.log('plane', plane)
+     
         window.addEventListener('mousemove', (e) => {
             let track1X = e.clientX - window.innerWidth / 2
             let track2X = track1X / (window.innerWidth)
             let resX = Math.sin(Math.PI * track2X)
             camera.position.x = resX
-            // console.log('track2X', track2X)
             let track1Y = e.clientY - window.innerHeight / 2
             let track2Y = track1Y / (window.innerHeight)
             let resY = Math.sin(Math.PI * track2Y)
-            // console.log(resX, resY)
-            // console.log('track1Y', track1Y)
-            // console.log('track2Y', track2Y)
-            console.log('resY', resY)
+  
             camera.position.y = resY
             renderer.render(scene, camera)
         })

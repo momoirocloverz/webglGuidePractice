@@ -6,15 +6,12 @@
 
 <script>
 import { ref, reactive, onMounted } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import * as dat from 'lil-gui'
 
 export default {
   setup() {
-    const Router = useRouter()
-    const Route = useRoute()
     const state = reactive({})
     const gui = new dat.GUI()
     const initAction = () => {
@@ -24,22 +21,17 @@ export default {
 
       const textureLoader = new THREE.TextureLoader()
 
-      const sphere = new THREE.Mesh(
-        new THREE.SphereGeometry(1, 32, 32),
-        new THREE.MeshStandardMaterial({
-          roughness: 0.7
-        })
-      )
-
+      const spereMaterial = new THREE.MeshStandardMaterial({
+        roughness: 0.7
+      })
+      const sphere = new THREE.Mesh(new THREE.SphereGeometry(1, 32, 32), spereMaterial)
       scene.add(sphere)
       console.log('sphere', sphere)
-
-      const floor = new THREE.Mesh(
-        new THREE.PlaneGeometry(20, 20),
-        new THREE.MeshStandardMaterial({
-          color: '#a9c388'
-        })
-      )
+      const floorColor = {
+        color: '#a9c388'
+      }
+      const floorMaterial = new THREE.MeshStandardMaterial(floorColor)
+      const floor = new THREE.Mesh(new THREE.PlaneGeometry(20, 20), floorMaterial)
       scene.add(floor)
       const ambientLight = new THREE.AmbientLight('#ffffff', 0.5)
       gui.add(ambientLight, 'intensity').min(0).max(1).step(0.001)
@@ -52,18 +44,22 @@ export default {
       gui.add(moonLight.position, 'y').min(-5).max(5).step(0.001)
       gui.add(moonLight.position, 'z').min(-5).max(5).step(0.001)
       scene.add(moonLight)
+      gui.add(floor, 'visible').name('floorVisible')
+      gui.add(spereMaterial, 'wireframe')
+      gui.add(floorColor, 'color').onChange(() => {
+        floorMaterial.color.set(floorColor.color)
+      })
       const sizes = {
         width: window.innerWidth,
         height: window.innerHeight
       }
-      console.log('sizes', sizes)
 
       window.addEventListener('resize', () => {
         sizes.width = window.innerWidth
         sizes.height = window.innerHeight
 
         camera.aspect = sizes.width / sizes.height
-        camera.updateProjectMatrix()
+        camera.updateProjectionMatrix()
         renderer.setSize(sizes.width, sizes.height)
         renderer.setPixelRatio(window.devicePixelRatio * 2)
       })

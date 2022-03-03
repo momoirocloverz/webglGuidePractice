@@ -12,27 +12,58 @@ import * as dat from 'lil-gui'
 
 export default {
   setup() {
-    const state = reactive({})
+    const state = reactive({
+      //   mapSrc1: require('@/static/textures/door/color.jpg'),
+      mapSrc1: require('@/assets/textures/minecraft.png')
+    })
     const gui = new dat.GUI()
     const initAction = () => {
       const canvas = document.querySelector('.webgl')
-
       const scene = new THREE.Scene()
-
       const textureLoader = new THREE.TextureLoader()
+      const texture = textureLoader.load(
+        state.mapSrc1,
+        () => {
+          console.log('loading texture finished')
+        },
+        () => {
+          console.log('loading texture progressing')
+        },
+        () => {
+          console.log('loading texture error')
+        }
+      )
+      console.log('texture', texture)
 
-      const spereMaterial = new THREE.MeshStandardMaterial({
-        roughness: 0.7
+      texture.wrapS = THREE.MirroredRepeatWrapping
+      texture.wrapT = THREE.MirroredRepeatWrapping
+
+      texture.generateMipmaps = false
+      texture.minFilter = THREE.NearestFilter
+      texture.magFilter = THREE.NearestFilter
+      // const spereMaterial = new THREE.MeshStandardMaterial({
+      //   roughness: 0.7,
+      // })
+      const spereMaterial = new THREE.MeshBasicMaterial({
+        map: texture
       })
-      const sphere = new THREE.Mesh(new THREE.SphereGeometry(1, 32, 32), spereMaterial)
-      scene.add(sphere)
-      console.log('sphere', sphere)
+      //   const sphere = new THREE.Mesh(new THREE.SphereGeometry(1, 32, 32), spereMaterial)
+      //   scene.add(sphere)
+      //   console.log('sphere', sphere)
+      const geometry = new THREE.BoxGeometry(1, 1, 1)
+      const mesh = new THREE.Mesh(geometry, spereMaterial)
+
+      scene.add(mesh)
+
       const floorColor = {
-        color: '#a9c388'
+        color: '#a9c388',
+        spin: () => {
+          console.log('hi spin')
+        }
       }
       const floorMaterial = new THREE.MeshStandardMaterial(floorColor)
       const floor = new THREE.Mesh(new THREE.PlaneGeometry(20, 20), floorMaterial)
-      scene.add(floor)
+      //   scene.add(floor)
       const ambientLight = new THREE.AmbientLight('#ffffff', 0.5)
       gui.add(ambientLight, 'intensity').min(0).max(1).step(0.001)
       scene.add(ambientLight)
@@ -49,6 +80,7 @@ export default {
       gui.add(floorColor, 'color').onChange(() => {
         floorMaterial.color.set(floorColor.color)
       })
+      gui.add(floorColor, 'spin')
       const sizes = {
         width: window.innerWidth,
         height: window.innerHeight

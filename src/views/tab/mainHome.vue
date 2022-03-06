@@ -12,9 +12,10 @@ import * as dat from 'lil-gui'
 export default {
   setup() {
     const state = reactive({
-      mapSrc1: require('@/assets/textures/door/ambientOcclusion.jpg')
+      //   mapSrc1: require('@/assets/textures/door/ambientOcclusion.jpg')
+    //   mapSrc1: require('@/assets/textures/door/color.jpg')
       //   mapSrc1: require('@/assets/textures/minecraft.png'),
-      //   mapSrc1: require('@/assets/textures/checkerboard-1024x1024.png'),
+        mapSrc1: require('@/assets/textures/checkerboard-1024x1024.png'),
     })
     const gui = new dat.GUI()
     const initAction = () => {
@@ -31,24 +32,42 @@ export default {
       const texture = textureLoader.load(state.mapSrc1)
       texture.wrapS = THREE.MirroredRepeatWrapping
       texture.wrapT = THREE.MirroredRepeatWrapping
+
+      texture.wrapS = THREE.RepeatWrapping
+      texture.wrapT = THREE.RepeatWrapping
+
+    //   texture.repeat.x = 3
+    //   texture.repeat.y = 3
+    //   texture.offset.x = 0.2
+    //   texture.offset.y = 0.2
+
+       texture.center.x = 0.5
+      texture.center.y = 0.5
+
+      texture.rotation = Math.PI * 0.3
+
       texture.generateMipmaps = false
       texture.minFilter = THREE.NearestFilter
       texture.magFilter = THREE.NearestFilter
-      console.log('loadingManager', loadingManager)
-      console.log('textureLoader', textureLoader)
+      console.log('texture', texture)
+
       // const spereMaterial = new THREE.MeshStandardMaterial({
       //   roughness: 0.7,
       // })
       const spereMaterial = new THREE.MeshBasicMaterial({
-        map: texture
+        map: texture,
+        // roughness: 0.7,
+        color: '#fff'
       })
-      //   const sphere = new THREE.Mesh(new THREE.SphereGeometry(1, 32, 32), spereMaterial)
+      const sphere = new THREE.Mesh(new THREE.SphereGeometry(1, 32, 32), spereMaterial)
       //   scene.add(sphere)
       //   console.log('sphere', sphere)
-      const geometry = new THREE.BoxGeometry(1, 1, 1)
+      const geometry = new THREE.BoxGeometry(3, 3, 3)
       const mesh = new THREE.Mesh(geometry, spereMaterial)
 
       scene.add(mesh)
+
+      console.log('geometry', geometry.attributes.uv)
 
       const floorColor = {
         color: '#a9c388',
@@ -92,9 +111,9 @@ export default {
       })
 
       const camera = new THREE.PerspectiveCamera(50, sizes.width / sizes.height, 0.1, 100)
-      camera.position.x = 4
+      camera.position.x = 2
       camera.position.y = 2
-      camera.position.z = 5
+      camera.position.z = 8
 
       scene.add(camera)
       const controls = new OrbitControls(camera, canvas)

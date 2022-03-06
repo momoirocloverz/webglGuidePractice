@@ -9,38 +9,33 @@ import { ref, reactive, onMounted } from 'vue'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import * as dat from 'lil-gui'
-
 export default {
   setup() {
     const state = reactive({
-      //   mapSrc1: require('@/static/textures/door/color.jpg'),
-      mapSrc1: require('@/assets/textures/minecraft.png')
+      mapSrc1: require('@/assets/textures/door/ambientOcclusion.jpg')
+      //   mapSrc1: require('@/assets/textures/minecraft.png'),
+      //   mapSrc1: require('@/assets/textures/checkerboard-1024x1024.png'),
     })
     const gui = new dat.GUI()
     const initAction = () => {
       const canvas = document.querySelector('.webgl')
       const scene = new THREE.Scene()
-      const textureLoader = new THREE.TextureLoader()
-      const texture = textureLoader.load(
-        state.mapSrc1,
-        () => {
-          console.log('loading texture finished')
-        },
-        () => {
-          console.log('loading texture progressing')
-        },
-        () => {
-          console.log('loading texture error')
-        }
-      )
-      console.log('texture', texture)
-
+      const loadingManager = new THREE.LoadingManager()
+      loadingManager.onStart = () => {
+        console.log('loading onStart')
+      }
+      loadingManager.onLoad = () => {
+        console.log('loading onLoad')
+      }
+      const textureLoader = new THREE.TextureLoader(loadingManager)
+      const texture = textureLoader.load(state.mapSrc1)
       texture.wrapS = THREE.MirroredRepeatWrapping
       texture.wrapT = THREE.MirroredRepeatWrapping
-
       texture.generateMipmaps = false
       texture.minFilter = THREE.NearestFilter
       texture.magFilter = THREE.NearestFilter
+      console.log('loadingManager', loadingManager)
+      console.log('textureLoader', textureLoader)
       // const spereMaterial = new THREE.MeshStandardMaterial({
       //   roughness: 0.7,
       // })

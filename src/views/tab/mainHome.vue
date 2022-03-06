@@ -12,20 +12,60 @@ import * as dat from 'lil-gui'
 export default {
   setup() {
     const state = reactive({
-      //   mapSrc1: require('@/assets/textures/door/ambientOcclusion.jpg')
-      mapSrc1: require('@/assets/textures/door/color.jpg')
-      //   mapSrc1: require('@/assets/textures/minecraft.png'),
-      //   mapSrc1: require('@/assets/textures/checkerboard-1024x1024.png')
+      mapSrc1: require('@/assets/textures/door/color.jpg'),
+      mapSrc2: require('@/assets/textures/door/alpha.jpg'),
+      mapSrc3: require('@/assets/textures/door/ambientOcclusion.jpg'),
+      mapSrc4: require('@/assets/textures/door/height.jpg'),
+      mapSrc5: require('@/assets/textures/door/metalness.jpg'),
+      mapSrc6: require('@/assets/textures/door/normal.jpg'),
+      mapSrc7: require('@/assets/textures/door/roughness.jpg'),
+      mapSrc8: require('@/assets/textures/matcaps/7.png'),
+      mapSrc9: require('@/assets/textures/matcaps/8.png')
+      //   mapSrc10: require('@/assets/textures/checkerboard-1024x1024.png')
     })
     const gui = new dat.GUI()
     const initAction = () => {
       const canvas = document.querySelector('.webgl')
       const scene = new THREE.Scene()
-      const material = new THREE.MeshBasicMaterial({
-        color: '#578',
-        wireframe: true
-      })
+      const textureLoader = new THREE.TextureLoader()
+      const doorColorTexture = textureLoader.load(state.mapSrc1)
+      const doorAlphaTexture = textureLoader.load(state.mapSrc2)
+      const matcapTexture = textureLoader.load(state.mapSrc9)
+      //   const material = new THREE.MeshBasicMaterial({
+      //     color: '#fff',
+      //     // wireframe: true,
+      //     map: doorColorTexture,
+      //     transparent: true,
+      //     opacity: 0.7,
+      //     // alphaMap: doorAlphaTexture,
+      //     side: THREE.DoubleSide,
+      //     flatShading: true
+      //   })
+      //   const material = new THREE.MeshNormalMaterial({
+      //     flatShading: true
+      //     // wireframe: true
+      //   })
+      //   const material = new THREE.MeshMatcapMaterial({
+      //     flatShading: true,
+      //     matcap: matcapTexture,
+      //     side: THREE.DoubleSide
+      //     // wireframe: true
+      //   })
+
+      //   const material = new THREE.MeshLambertMaterial({
+      //     // color: 0xffffff
+      //   })
+      const material = new THREE.MeshLambertMaterial()
       console.log('material', material)
+      const ambientLight = new THREE.AmbientLight(0xf7ff5f, 1.0)
+      scene.add(ambientLight)
+      console.log('ambientLight', ambientLight)
+      const pointLight = new THREE.PointLight(0xffffff, 0.5)
+      pointLight.position.x = 2
+      pointLight.position.y = 2
+      pointLight.position.z = 3
+      //   scene.add(pointLight)
+
       const sphere = new THREE.Mesh(new THREE.SphereGeometry(0.5, 16, 16), material)
       sphere.position.x = -1.5
       console.log('sphere', sphere)

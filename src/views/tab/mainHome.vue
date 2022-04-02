@@ -57,7 +57,7 @@ export default {
       //   })
       const material = new THREE.MeshLambertMaterial()
       console.log('material', material)
-      const ambientLight = new THREE.AmbientLight(0xf7ff5f, 1.0)
+      const ambientLight = new THREE.AmbientLight(0x789, 1.0)
       scene.add(ambientLight)
       console.log('ambientLight', ambientLight)
       const pointLight = new THREE.PointLight(0xffffff, 0.5)
@@ -65,7 +65,6 @@ export default {
       pointLight.position.y = 2
       pointLight.position.z = 3
       //   scene.add(pointLight)
-
       const sphere = new THREE.Mesh(new THREE.SphereGeometry(0.5, 16, 16), material)
       sphere.position.x = -1.5
       console.log('sphere', sphere)
